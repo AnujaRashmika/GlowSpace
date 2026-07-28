@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "780280659953",
+    "project_id": "glowspace-3ce5a",
+    "storage_bucket": "glowspace-3ce5a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780280659953:android:2dbfc9d2a13b3817b38e50",
+        "android_client_info": {
+          "package_name": "com.beautyweb.beauty_shop_web"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCI2dLRJMmySorphC_jMg9ijZW3teMs45E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
