@@ -6,25 +6,63 @@ import '../services/firestore_service.dart';
 
 class ProductProvider extends ChangeNotifier {
 
-  final FirestoreService _service =
-  FirestoreService();
+
+  final FirestoreService _service = FirestoreService();
 
 
   List<Product> _products = [];
 
+
   List<Product> get products => _products;
+
+
+  bool isLoading = true;
 
 
 
   void loadProducts() {
 
-    _service.getProducts().listen((data){
 
-      _products = data;
+    isLoading = true;
+    notifyListeners();
 
-      notifyListeners();
 
-    });
+
+    _service.getProducts().listen(
+
+          (data){
+
+
+        _products = data;
+
+
+        isLoading = false; // ✅ important
+
+
+        notifyListeners();
+
+
+      },
+
+
+      onError: (error){
+
+
+        debugPrint(
+          "Firestore Error: $error",
+        );
+
+
+        isLoading = false; // ✅ stop shimmer even error
+
+
+        notifyListeners();
+
+
+      },
+
+    );
+
 
   }
 
@@ -32,10 +70,13 @@ class ProductProvider extends ChangeNotifier {
 
   List<Product> get featuredProducts {
 
+
     return _products
         .where((product) => product.featured)
         .toList();
 
+
   }
+
 
 }
