@@ -205,7 +205,7 @@ class ProductCard extends StatelessWidget {
 
                 Text(
 
-                  "\$${product!.discountPrice}",
+                  "\Rs. ${product!.discountPrice}",
 
 
                   style: const TextStyle(
@@ -226,7 +226,7 @@ class ProductCard extends StatelessWidget {
 
                 Text(
 
-                  "\$${product!.price}",
+                  "\Rs. ${product!.price}",
 
 
                   style: const TextStyle(
