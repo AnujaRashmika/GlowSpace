@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
+import 'providers/banner_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/product_provider.dart';
 import 'screens/splash/splash_screen.dart';
@@ -23,6 +24,10 @@ void main() async {
 
         ChangeNotifierProvider(
           create: (_) => CategoryProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => BannerProvider(),
         ),
       ],
 

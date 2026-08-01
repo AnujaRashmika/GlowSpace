@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../providers/banner_provider.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../widgets/banner_shimmer.dart';
+import '../../widgets/banner_slider.dart';
 import '../../widgets/category_card.dart';
 import '../../widgets/category_shimmer.dart';
 import '../../widgets/product_card.dart';
@@ -29,6 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
         listen: false,
       ).loadCategories();
+
+      Provider.of<BannerProvider>(
+        context,
+        listen: false,
+      ).loadBanners();
     });
   }
 
@@ -44,17 +52,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final categoryProvider =
     Provider.of<CategoryProvider>(context);
 
+    final bannerProvider =
+    Provider.of<BannerProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "GlowSpace",
-        ),
       ),
 
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            bannerProvider.isLoading
+                ? const BannerShimmer()
+                : BannerSlider(
+              banners: bannerProvider.banners,
+            ),
+
             const Padding(
               padding: EdgeInsets.all(16),
               child: Text(

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../models/banner_model.dart';
 import '../models/category.dart';
 import '../models/product.dart';
 
@@ -8,6 +9,23 @@ class FirestoreService {
 
   final FirebaseFirestore _firestore =
       FirebaseFirestore.instance;
+
+  // Get all banners
+
+  Stream<List<BannerModel>> getBanners() {
+    return _firestore
+        .collection('banners')
+        .where('active', isEqualTo: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return BannerModel.fromFirestore(
+          doc.data(),
+          doc.id,
+        );
+      }).toList();
+    });
+  }
 
   // Get all categories
 
