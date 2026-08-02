@@ -3,10 +3,12 @@ import 'package:provider/provider.dart';
 import '../../providers/banner_provider.dart';
 import '../../providers/category_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../providers/search_provider.dart';
 import '../../widgets/banner_shimmer.dart';
 import '../../widgets/banner_slider.dart';
 import '../../widgets/category_card.dart';
 import '../../widgets/category_shimmer.dart';
+import '../../widgets/common_app_bar.dart';
 import '../../widgets/product_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,7 +24,21 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    Future.microtask(() {
+    Future.microtask(() async {
+
+      final productProvider =
+      Provider.of<ProductProvider>(
+        context,
+        listen: false,
+      );
+
+      await productProvider.loadProducts();
+
+      Provider.of<SearchProvider>(
+        context,
+        listen: false,
+      ).setProducts(productProvider.products);
+
       Provider.of<ProductProvider>(
         context,
         listen: false,
@@ -56,7 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Provider.of<BannerProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: const CommonAppBar(
+        title: "GlowSpace",
       ),
 
       body: SingleChildScrollView(

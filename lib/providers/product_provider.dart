@@ -9,26 +9,39 @@ class ProductProvider extends ChangeNotifier {
   List<Product> get products => _products;
   bool isLoading = true;
 
-  void loadProducts() {
+  List<Product> searchResult(String query) {
+
+    if (query.trim().isEmpty) {
+      return _products;
+    }
+
+    return _products.where((product) {
+
+      return product.name
+          .toLowerCase()
+          .contains(query.toLowerCase()) ||
+
+          product.description
+              .toLowerCase()
+              .contains(query.toLowerCase());
+
+    }).toList();
+
+  }
+
+  Future<void> loadProducts() async {
     isLoading = true;
     notifyListeners();
 
-    _service.getProducts().listen(
-          (data){
-        _products = data;
-        isLoading = false;
-        notifyListeners();
-      },
-
-      onError: (error){
-        debugPrint(
-          "Firestore Error: $error",
-        );
-
-        isLoading = false;
-        notifyListeners();
-      },
-    );
+    try {
+      _products = await _service.getProducts().first;
+      isLoading = false;
+      notifyListeners();
+    } catch (error) {
+      debugPrint("Firestore Error: $error");
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   List<Product> get featuredProducts {

@@ -5,72 +5,45 @@ import '../../providers/product_provider.dart';
 import '../../widgets/common_app_bar.dart';
 import '../../widgets/product_card.dart';
 
-class ProductsScreen extends StatelessWidget {
+class SearchResultScreen extends StatelessWidget {
+  final String query;
 
-  final String title;
-  final String? query;
-
-  const ProductsScreen({
+  const SearchResultScreen({
     super.key,
-    required this.title,
-    this.query,
+    required this.query,
   });
 
   @override
   Widget build(BuildContext context) {
-
     final provider = context.watch<ProductProvider>();
 
-    final products = query == null
-        ? provider.products
-        : provider.searchResult(query!);
+    final results = provider.searchResult(query);
 
     return Scaffold(
-
       appBar: CommonAppBar(
-        title: title,
+        title: query,
         showBackButton: true,
       ),
-
-      body: products.isEmpty
-
+      body: results.isEmpty
           ? const Center(
-        child: Text(
-          "No products found",
-        ),
+        child: Text("No products found"),
       )
-
           : GridView.builder(
-
         padding: const EdgeInsets.all(16),
-
-        itemCount: products.length,
-
+        itemCount: results.length,
         gridDelegate:
-        const SliverGridDelegateWithFixedCrossAxisCount(
-
-          crossAxisCount: 2,
-
+        const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 190,
           crossAxisSpacing: 14,
-
           mainAxisSpacing: 14,
-
-          childAspectRatio: .63,
-
+          childAspectRatio: 0.58,
         ),
-
-        itemBuilder: (context,index){
-
+        itemBuilder: (context, index) {
           return ProductCard(
-            product: products[index],
+            product: results[index],
           );
-
         },
-
       ),
-
     );
-
   }
-
 }

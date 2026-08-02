@@ -6,6 +6,7 @@ import 'config/theme.dart';
 import 'providers/banner_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/product_provider.dart';
+import 'providers/search_provider.dart';
 import 'screens/splash/splash_screen.dart';
 
 void main() async {
@@ -28,6 +29,10 @@ void main() async {
 
         ChangeNotifierProvider(
           create: (_) => BannerProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => SearchProvider(),
         ),
       ],
 
