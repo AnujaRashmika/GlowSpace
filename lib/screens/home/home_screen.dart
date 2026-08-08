@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: const SizedBox(
                         width: 170,
                         child: ProductCard(
-                          isLoading: true,
+                          isLoading: true, product: null,
                         ),
                       ),
                     );
