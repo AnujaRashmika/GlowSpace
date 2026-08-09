@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../models/product.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -17,24 +16,56 @@ class ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   int _currentImage = 0;
   int _quantity = 1;
+  late final PageController _pageController;
 
   static const Color _accent = Color(0xFF7C5CFC); // GlowSpace brand purple
   static const Color _dark = Color(0xFF1B1B1F);
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goToPreviousImage() {
+    if (_currentImage > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _goToNextImage() {
+    if (_currentImage < widget.product.imageUrls.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final product = widget.product;
-
     final bool hasDiscount =
         product.discountPrice > 0 && product.discountPrice < product.price;
-
     final double finalPrice =
     hasDiscount ? product.discountPrice : product.price;
-
     final int discountPercent = hasDiscount
         ? (((product.price - product.discountPrice) / product.price) * 100)
         .round()
         : 0;
+
+    // Web / tablet වලට arrows පෙන්නන්න
+    final bool showArrows = MediaQuery.of(context).size.width >= 600 &&
+        product.imageUrls.length > 1;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -74,6 +105,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       height: 400,
                       width: double.infinity,
                       child: PageView.builder(
+                        controller: _pageController,
                         itemCount: product.imageUrls.length,
                         onPageChanged: (index) {
                           setState(() => _currentImage = index);
@@ -85,8 +117,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               product.imageUrls[index],
                               width: double.infinity,
                               fit: BoxFit.contain,
-                              loadingBuilder:
-                                  (context, child, progress) {
+                              loadingBuilder: (context, child, progress) {
                                 if (progress == null) return child;
                                 return const Center(
                                   child: CircularProgressIndicator(
@@ -110,7 +141,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       ),
                     ),
 
-                    // subtle top gradient so back/share icons stay legible
+                    // subtle top gradient
                     Container(
                       height: 120,
                       decoration: const BoxDecoration(
@@ -156,6 +187,37 @@ class _ProductDetailsState extends State<ProductDetails> {
                           ),
                         ),
                       ),
+
+                    // ---------- LEFT / RIGHT ARROWS (Web only) ----------
+                    if (showArrows) ...[
+                      // Left arrow
+                      Positioned(
+                        left: 12,
+                        top: 0,
+                        bottom: 0,
+                        child: Center(
+                          child: _ImageNavButton(
+                            icon: Icons.chevron_left_rounded,
+                            enabled: _currentImage > 0,
+                            onTap: _goToPreviousImage,
+                          ),
+                        ),
+                      ),
+                      // Right arrow
+                      Positioned(
+                        right: 12,
+                        top: 0,
+                        bottom: 0,
+                        child: Center(
+                          child: _ImageNavButton(
+                            icon: Icons.chevron_right_rounded,
+                            enabled:
+                            _currentImage < product.imageUrls.length - 1,
+                            onTap: _goToNextImage,
+                          ),
+                        ),
+                      ),
+                    ],
 
                     // IMAGE INDICATORS
                     if (product.imageUrls.length > 1)
@@ -225,7 +287,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                             _StockPill(inStock: product.stock > 0),
                           ],
                         ),
-
                         const SizedBox(height: 14),
 
                         // PRICE
@@ -258,9 +319,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         ),
 
                         const SizedBox(height: 24),
-
                         Container(height: 1, color: const Color(0xFFF0EEF6)),
-
                         const SizedBox(height: 20),
 
                         // DESCRIPTION
@@ -310,8 +369,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   _QtyButton(
                                     icon: Icons.remove_rounded,
                                     enabled: _quantity > 1,
-                                    onTap: () =>
-                                        setState(() => _quantity--),
+                                    onTap: () => setState(() => _quantity--),
                                   ),
                                   SizedBox(
                                     width: 36,
@@ -328,8 +386,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   _QtyButton(
                                     icon: Icons.add_rounded,
                                     enabled: _quantity < product.stock,
-                                    onTap: () =>
-                                        setState(() => _quantity++),
+                                    onTap: () => setState(() => _quantity++),
                                   ),
                                 ],
                               ),
@@ -440,6 +497,54 @@ class _ProductDetailsState extends State<ProductDetails> {
   }
 }
 
+/// Web image navigation arrow button
+class _ImageNavButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _ImageNavButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(30),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: enabled ? 1.0 : 0.35,
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.92),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              size: 28,
+              color: const Color(0xFF1B1B1F),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Small circular translucent icon button used in the app bar over the image.
 class _CircleIconButton extends StatelessWidget {
   final IconData icon;
@@ -543,7 +648,7 @@ class _QtyButton extends StatelessWidget {
               color: Colors.black.withOpacity(0.06),
               blurRadius: 4,
               offset: const Offset(0, 1),
-            ),
+            )
           ]
               : [],
         ),
